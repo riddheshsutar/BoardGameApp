@@ -1,4 +1,4 @@
-# Board Game Listing Web App – AWS ECS Deployment
+# Automating Secure Deployment of Board game Listing WebApp on AWS
 
 ## Project Overview
 This project demonstrates a **full end-to-end CI/CD deployment** of a Dockerized Java Maven web application on **AWS ECS Fargate** with an **Application Load Balancer (ALB)** and **CloudWatch monitoring**.
