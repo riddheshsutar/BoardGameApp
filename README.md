@@ -160,7 +160,7 @@ CloudWatch Logs
 
 CloudWatch Metrics
 
-<img width="1919" height="806" alt="Screenshot 2025-10-11 012749" src="https://github.com/user-attachments/assets/34cb0906-392e-4b8e-92ce-2b21a265b6dc" />
+<img width="1919" height="799" alt="Screenshot 2025-10-11 021626" src="https://github.com/user-attachments/assets/0212066a-694f-4e02-bede-776ce65e71c4" />
 
 
 
