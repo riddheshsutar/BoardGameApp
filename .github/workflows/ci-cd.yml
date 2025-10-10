@@ -1,0 +1,80 @@
+name: CI → Build → Scan → Push to ECR
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  IMAGE_NAME: boardgame-app
+
+jobs:
+  build-and-scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: '17'
+
+    - name: Cache Maven local repo
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-m2-
+
+    - name: Build with Maven (tests)
+      run: mvn -B -DskipTests=false clean package
+
+    - name: OWASP Dependency-Check
+      run: mvn org.owasp:dependency-check-maven:check || true
+      # Pipeline won't fail on findings here (you can change to fail on high later)
+
+    - name: Login to Amazon ECR
+      id: ecr-login
+      env:
+        AWS_REGION: ${{ secrets.AWS_REGION }}
+        AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      run: |
+        aws --version
+        aws ecr get-login-password --region $AWS_REGION \
+          | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${AWS_REGION}.amazonaws.com
+      # Uses AWS CLI v2 get-login-password (recommended). :contentReference[oaicite:1]{index=1}
+
+    - name: Build Docker image
+      run: |
+        IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ env.IMAGE_NAME }}:{{ github.sha }}
+        docker build -t $IMAGE_URI .
+        docker tag $IMAGE_URI ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ env.IMAGE_NAME }}:latest
+
+    - name: Trivy scan
+      uses: aquasecurity/trivy-action@v1
+      with:
+        image-ref: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ env.IMAGE_NAME }}:{{ github.sha }}
+      # Trivy action supports caching DB updates in a separate workflow (recommended). :contentReference[oaicite:2]{index=2}
+
+    - name: Push to ECR
+      run: |
+        IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ env.IMAGE_NAME }}:{{ github.sha }}
+        docker push $IMAGE_URI
+        docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ env.IMAGE_NAME }}:latest
+
+    - name: Deploy to ECS
+      run: |
+        aws ecs update-service \
+          --cluster boardgame-cluster \
+          --service boardgame-service \
+          --force-new-deployment \
+          --region ${{ secrets.AWS_REGION }}

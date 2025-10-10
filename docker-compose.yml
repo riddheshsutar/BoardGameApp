@@ -1,0 +1,30 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    container_name: boardgame-app
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      # If you want to use Postgres instead of H2, uncomment DB env below
+      # SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/boarddb
+      # SPRING_DATASOURCE_USERNAME: postgres
+      # SPRING_DATASOURCE_PASSWORD: example
+    depends_on: []
+    restart: on-failure
+
+  # optional postgres - for testing migration to RDS later (commented out initially)
+  # db:
+  #   image: postgres:13
+  #   environment:
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: example
+  #     POSTGRES_DB: boarddb
+  #   volumes:
+  #     - pgdata:/var/lib/postgresql/data
+  #   ports:
+  #     - "5432:5432"
+
+# volumes:
+#   pgdata:
