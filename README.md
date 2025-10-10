@@ -16,7 +16,64 @@ This project demonstrates a **full end-to-end CI/CD deployment** of a Dockerized
 
 ## Architecture
 
-GitHub → CI/CD → ECR → ECS → ALB → CloudWatch Logs/Metrics
+        ┌────────────┐
+        │   GitHub   │
+        │ (Source    │
+        │  Code Repo)│
+        └─────┬──────┘
+              │ Push / PR
+              ▼
+        ┌────────────┐
+        │   CI/CD    │
+        │ (GitHub    │
+        │ Actions /  │
+        │ Workflows) │
+        └─────┬──────┘
+              │ Build & Scan
+              ▼
+        ┌────────────┐
+        │    ECR     │
+        │ (Docker    │
+        │ Container  │
+        │ Registry)  │
+        └─────┬──────┘
+              │ Deploy
+              ▼
+        ┌────────────┐
+        │    ECS     │
+        │ (Fargate / │
+        │ Container │
+        │ Tasks)     │
+        └─────┬──────┘
+              │ Serve Traffic
+              ▼
+        ┌────────────┐
+        │    ALB     │
+        │ (Application│
+        │ Load       │
+        │ Balancer)  │
+        └─────┬──────┘
+              │ Logs & Metrics
+              ▼
+        ┌────────────┐
+        │ CloudWatch │
+        │ Logs &     │
+        │ Metrics    │
+        └────────────┘
+
+### Explanation:
+
+GitHub: Source code repository.
+
+CI/CD: GitHub Actions workflow builds, tests, and scans the Docker image.
+
+ECR: Stores the container image.
+
+ECS: Runs container tasks from ECR.
+
+ALB: Distributes incoming traffic to ECS tasks.
+
+CloudWatch: Collects logs and metrics from ECS, ALB, and other AWS services.
 
 ## Deployment Steps
 
