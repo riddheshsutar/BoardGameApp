@@ -185,9 +185,8 @@ Security Scanning (Trivy, OWASP Dependency Check)
 
 Infrastructure as Code (Terraform Integration)
 
-Author
 
-Riddhesh Sutar
+Riddhesh Sutar - AWS Fresher
 GitHub: https://github.com/riddheshsutar
 
 LinkedIn: https://www.linkedin.com/in/sutarriddhesh22/
