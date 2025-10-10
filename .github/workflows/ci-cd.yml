@@ -60,7 +60,7 @@ jobs:
         docker tag $IMAGE_URI ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ env.IMAGE_NAME }}:latest
 
     - name: Trivy scan
-      uses: aquasecurity/trivy-action@v1
+      uses: aquasecurity/trivy-action@v0.14.0
       with:
         image-ref: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ env.IMAGE_NAME }}:{{ github.sha }}
       # Trivy action supports caching DB updates in a separate workflow (recommended). :contentReference[oaicite:2]{index=2}
