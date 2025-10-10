@@ -131,7 +131,6 @@ Infrastructure as Code (Terraform Integration)
 Author
 
 Riddhesh Sutar
-GitHub: @riddheshsutar
+GitHub: https://github.com/riddheshsutar
 
-LinkedIn: linkedin.com/in/riddheshsutar
-
+LinkedIn: https://www.linkedin.com/in/sutarriddhesh22/
